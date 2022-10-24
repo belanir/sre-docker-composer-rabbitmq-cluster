@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+
+  rabbitmqmaster:
+    image: rabbitmq:3-management
+    hostname: rabbitmqmaster
+    ports:
+        - "5672:5672"
+        - "15672:15672"
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=12345
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+  rabbitmq1:
+        image: rabbitmq:3-management
+        hostname: rabbitmq1
+        ports:
+            - "5673:5672"
+            - "15673:15672"
+        depends_on:
+          - rabbitmqmaster
+        environment:
+          - RABBITMQ_ERLANG_COOKIE=12345
+        links:
+            - rabbitmqmaster
+        volumes:
+          - ./cluster-entrypoint.sh:/usr/local/bin/cluster-entrypoint.sh
+        entrypoint: /usr/local/bin/cluster-entrypoint.sh
+  rabbitmq2:
+        image: rabbitmq:3-management
+        hostname: rabbitmq2
+        ports:
+            - "5674:5672"
+            - "15674:15672"
+        depends_on:
+          - rabbitmqmaster
+        environment:
+          - RABBITMQ_ERLANG_COOKIE=12345
+        links:
+            - rabbitmqmaster
+        volumes:
+          - ./cluster-entrypoint.sh:/usr/local/bin/cluster-entrypoint.sh
+        entrypoint: /usr/local/bin/cluster-entrypoint.sh
